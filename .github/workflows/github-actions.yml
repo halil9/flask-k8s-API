@@ -1,0 +1,41 @@
+name: PythonCheck
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  python_security_scan:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    name: PythonCodeScan
+    steps:
+    - uses: actions/checkout@v2
+    - name: Bandit Scan
+      run: |
+        set -e
+        pip3 install bandit
+        bandit -r ./flask-api -lll
+    - name: Safety Scan
+      run: |
+        set -e
+        pip3 install jake
+        jake -w ddt 
+  build:
+    runs-on: ubuntu-latest
+    name: Build and Scan
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build an image from Dockerfile
+        run: |
+          docker build -t halil9/flask-api:v3 ./flask-api
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'halil9/flask-api:v3'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          severity: 'CRITICAL,HIGH,MEDIUM'
