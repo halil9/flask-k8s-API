@@ -1,0 +1,19 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    release: {{ .Values.monitoring.label }}
+  name: {{ include "flask-api.fullname" . }}
+spec:
+  endpoints:
+  - interval: 5s
+    path: /metrics
+    targetPort: 5000
+  namespaceSelector:
+    matchNames:
+    - {{ .Values.monitoring.namespaceSelector }}
+  jobLabel: flask-api
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: flask-api
+      app.kubernetes.io/name: flask-api

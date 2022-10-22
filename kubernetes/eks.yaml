@@ -1,0 +1,15 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: k8s-playground
+  region: eu-west-1
+  version: '1.23'
+
+nodeGroups:
+  - name: node-group-flask
+    instanceType: t2.large
+    desiredCapacity: 2
+    volumeSize: 80
+    ssh:
+      allow: true # will use ~/.ssh/id_rsa.pub as the default ssh key
